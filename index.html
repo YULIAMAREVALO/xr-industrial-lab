@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Laboratorio XR - Control Multiplataforma</title>
   
-  <!-- Librería principal A-Frame -->
   <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.1/dist/aframe-master.min.js"></script>
   
   <style>
-    /* Panel de control flotante interactivo */
     #ui-container {
       position: absolute;
       top: 20px;
@@ -17,19 +15,19 @@
       z-index: 9999;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(15, 23, 42, 0.85);
       padding: 16px;
       border-radius: 12px;
       backdrop-filter: blur(8px);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .ui-title {
       color: #f8fafc;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -37,61 +35,61 @@
       text-align: center;
     }
 
-    /* Botones dinámicos */
     .btn-xr {
       background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
       color: #ffffff;
       border: none;
-      padding: 12px 20px;
-      font-size: 14px;
+      padding: 10px 16px;
+      font-size: 13px;
       font-weight: 600;
       border-radius: 8px;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-      transition: all 0.25s ease-in-out;
+      transition: all 0.2s ease-in-out;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
     }
 
-    /* Efecto Hover (Al pasar el ratón) */
     .btn-xr:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+      box-shadow: 0 6px 18px rgba(59, 130, 246, 0.5);
       background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
     }
 
-    /* Efecto Clic */
     .btn-xr:active {
       transform: translateY(1px);
-      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
     }
 
-    /* Botón activo seleccionado */
     .btn-xr.active {
       background: linear-gradient(135deg, #10b981 0%, #047857 100%);
       box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
     }
 
-    /* Botón VR Especial */
+    .btn-all {
+      background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    }
+
+    .btn-all:hover {
+      background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+    }
+
     .btn-vr {
       background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
-      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
     .btn-vr:hover {
       background: linear-gradient(135deg, #f472b6 0%, #db2777 100%);
-      box-shadow: 0 6px 20px rgba(236, 72, 153, 0.5);
     }
   </style>
 </head>
 <body>
 
-  <!-- MENÚ DE NAVEGACIÓN INTERACTIVO -->
+  <!-- MENÚ DE NAVEGACIÓN -->
   <div id="ui-container">
-    <div class="ui-title">Panel de Control XR</div>
+    <div class="ui-title">Escenas del Laboratorio</div>
     <button id="btn-primitivas" class="btn-xr active" onclick="mostrarPaso('primitivas')">
       <span>1. Primitivas Básicas</span> ➔
     </button>
@@ -101,8 +99,11 @@
     <button id="btn-cad" class="btn-xr" onclick="mostrarPaso('cad')">
       <span>3. Laminadoras CAD</span> ➔
     </button>
+    <button id="btn-todo" class="btn-xr btn-all" onclick="mostrarPaso('todo')">
+      <span>4. Ver Todo Junto</span> 🌐
+    </button>
     <button class="btn-xr btn-vr" onclick="entrarVR()">
-      <span>🥽 Modo VR Inmersivo</span>
+      <span>🥽 Modo VR</span>
     </button>
   </div>
 
@@ -112,17 +113,20 @@
     </a-assets>
 
     <!-- ENTORNO Y PISO -->
-    <a-plane rotation="-90 0 0" width="50" height="50" color="#1e293b"></a-plane>
-    <a-sky color="#0f172a"></a-sky>
+    <a-plane rotation="-90 0 0" width="60" height="60" color="#1e293b"></a-plane>
+    <a-sky color="#38bdf8"></a-sky>
     
-    <a-light type="ambient" color="#ffffff" intensity="0.9"></a-light>
-    <a-light type="directional" position="2 5 3" intensity="1.2"></a-light>
+    <!-- ILUMINACIÓN REFORZADA (MÁS LUZ) -->
+    <a-light type="ambient" color="#ffffff" intensity="1.5"></a-light>
+    <a-light type="directional" position="2 8 4" intensity="1.8" castShadow="true"></a-light>
+    <a-light type="directional" position="-4 5 -2" intensity="1.0" color="#e0f2fe"></a-light>
+    <a-light type="point" position="0 4 0" intensity="1.2" distance="20"></a-light>
 
     <!-- PASO 1: PRIMITIVAS BÁSICAS -->
     <a-entity id="grupo-primitivas" visible="true">
-      <a-box position="0 1 -3" rotation="0 45 0" color="#38bdf8"></a-box>
-      <a-sphere position="2 1 -4" radius="1" color="#f43f5e"></a-sphere>
-      <a-cylinder position="-2 1 -4" radius="0.5" height="1.5" color="#fbbf24"></a-cylinder>
+      <a-box position="0 1 -3" rotation="0 45 0" color="#0284c7"></a-box>
+      <a-sphere position="2 1 -4" radius="1" color="#e11d48"></a-sphere>
+      <a-cylinder position="-2 1 -4" radius="0.5" height="1.5" color="#d97706"></a-cylinder>
     </a-entity>
 
     <!-- PASO 2: BANDA TRANSPORTADORA -->
@@ -132,50 +136,70 @@
       <a-cylinder position="0 0.5 -7" rotation="0 0 90" radius="0.25" height="1.1" color="#0f172a"></a-cylinder>
       <a-cylinder position="-0.5 0.25 -2" radius="0.05" height="0.5" color="#334155"></a-cylinder>
       <a-cylinder position="0.5 0.25 -2" radius="0.05" height="0.5" color="#334155"></a-cylinder>
-      <a-box position="0 0.9 -3.5" width="0.6" height="0.4" depth="0.6" color="#d97706"></a-box>
+      <a-box position="0 0.9 -3.5" width="0.6" height="0.4" depth="0.6" color="#b45309"></a-box>
       <a-cylinder position="-0.8 1 -4" radius="0.03" height="1.2" color="#94a3b8"></a-cylinder>
-      <a-sphere position="-0.8 1.6 -4" radius="0.1" color="#22c55e"></a-sphere>
+      <a-sphere position="-0.8 1.6 -4" radius="0.1" color="#16a34a"></a-sphere>
     </a-entity>
 
-    <!-- PASO 3: LAMINADORAS CAD (Rotación a 90 grados para corregir posicionamiento) -->
+    <!-- PASO 3: LAMINADORAS CAD (ESCALA Y POSICIÓN AJUSTADAS) -->
     <a-entity id="grupo-cad" visible="false">
       <a-entity 
         gltf-model="#laminadorasCAD" 
-        position="0 1 -3" 
+        position="0 0.5 -3" 
         rotation="90 0 0" 
-        scale="0.01 0.01 0.01">
+        scale="0.0025 0.0025 0.0025">
       </a-entity>
     </a-entity>
 
-    <!-- CÁMARA DE NAVEGACIÓN -->
-    <a-entity id="rig" position="0 1.6 2">
-      <a-camera look-controls wasd-controls></a-camera>
+    <!-- CÁMARA CON CONTROLES LIGEROS -->
+    <a-entity id="rig" position="0 1.6 3">
+      <a-camera id="camara" look-controls wasd-controls="acceleration: 15"></a-camera>
     </a-entity>
   </a-scene>
 
-  <!-- LÓGICA DE INTERACCIÓN DE BOTONES Y ESTADOS -->
+  <!-- LÓGICA DE VISIBILIDAD Y REUBICACIÓN EN MODO "VER TODO" -->
   <script>
     function mostrarPaso(paso) {
-      // Ocultar todas las entidades
-      document.getElementById('grupo-primitivas').setAttribute('visible', 'false');
-      document.getElementById('grupo-banda').setAttribute('visible', 'false');
-      document.getElementById('grupo-cad').setAttribute('visible', 'false');
+      const gPrimitivas = document.getElementById('grupo-primitivas');
+      const gBanda = document.getElementById('grupo-banda');
+      const gCad = document.getElementById('grupo-cad');
 
-      // Remover clase 'active' de los botones
-      document.getElementById('btn-primitivas').classList.remove('active');
-      document.getElementById('btn-banda').classList.remove('active');
-      document.getElementById('btn-cad').classList.remove('active');
+      const botones = ['btn-primitivas', 'btn-banda', 'btn-cad', 'btn-todo'];
+      botones.forEach(b => document.getElementById(b).classList.remove('active'));
 
-      // Mostrar entidad seleccionada y marcar botón
       if (paso === 'primitivas') {
-        document.getElementById('grupo-primitivas').setAttribute('visible', 'true');
+        gPrimitivas.setAttribute('visible', 'true');
+        gPrimitivas.setAttribute('position', '0 0 0');
+        gBanda.setAttribute('visible', 'false');
+        gCad.setAttribute('visible', 'false');
         document.getElementById('btn-primitivas').classList.add('active');
+
       } else if (paso === 'banda') {
-        document.getElementById('grupo-banda').setAttribute('visible', 'true');
+        gPrimitivas.setAttribute('visible', 'false');
+        gBanda.setAttribute('visible', 'true');
+        gBanda.setAttribute('position', '0 0 0');
+        gCad.setAttribute('visible', 'false');
         document.getElementById('btn-banda').classList.add('active');
+
       } else if (paso === 'cad') {
-        document.getElementById('grupo-cad').setAttribute('visible', 'true');
+        gPrimitivas.setAttribute('visible', 'false');
+        gBanda.setAttribute('visible', 'false');
+        gCad.setAttribute('visible', 'true');
+        gCad.setAttribute('position', '0 0 0');
         document.getElementById('btn-cad').classList.add('active');
+
+      } else if (paso === 'todo') {
+        // Muestra los tres elementos distribuidos ordenadamente en la escena
+        gPrimitivas.setAttribute('visible', 'true');
+        gPrimitivas.setAttribute('position', '-4 0 0'); // A la izquierda
+
+        gBanda.setAttribute('visible', 'true');
+        gBanda.setAttribute('position', '0 0 0');  // Al centro
+
+        gCad.setAttribute('visible', 'true');
+        gCad.setAttribute('position', '4 0 -1');  // A la derecha
+
+        document.getElementById('btn-todo').classList.add('active');
       }
     }
 
