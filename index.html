@@ -2,36 +2,36 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Modelo Industrial - A-Frame</title>
+  <title>Laboratorio XR - Laminadoras Industriales</title>
+  <!-- Librería principal de A-Frame -->
   <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.1/dist/aframe-master.min.js"></script>
+  <!-- Librería de controles y visualización extra -->
+  <script src="https://cdn.jsdelivr.net/cdn.aframe-extras/6.1.1/aframe-extras.min.js"></script>
 </head>
 <body>
-  <a-scene>
-    <!-- PISO INDUSTRIAL -->
-    <a-plane rotation="-90 0 0" width="20" height="20" color="#333333"></a-plane>
+  <a-scene library>
+    <a-assets>
+      <a-asset-item id="laminadorasCAD" src="models/laminadoras.glb"></a-asset-item>
+    </a-assets>
+
+    <!-- ENTORNO E ILUMINACIÓN -->
+    <a-plane rotation="-90 0 0" width="100" height="100" color="#333333"></a-plane>
     <a-sky color="#87CEEB"></a-sky>
+    
+    <a-light type="ambient" color="#ffffff" intensity="1.2"></a-light>
+    <a-light type="directional" position="1 4 2" intensity="1.0"></a-light>
 
-    <!-- ESTRUCTURA DE LA BANDA TRANSPORTADORA -->
-    <!-- Base / Chasis -->
-    <a-box position="0 0.5 -4" width="1.2" height="0.4" depth="6" color="#555555"></a-box>
-    <!-- Cintas / Rodillos -->
-    <a-cylinder position="0 0.5 -1" rotation="0 0 90" radius="0.25" height="1.1" color="#111111"></a-cylinder>
-    <a-cylinder position="0 0.5 -7" rotation="0 0 90" radius="0.25" height="1.1" color="#111111"></a-cylinder>
+    <!-- CAMARA CON CÁLCULO AUTOMÁTICO -->
+    <a-entity id="rig" position="0 1.6 5">
+      <a-camera look-controls wasd-controls="fly: true; acceleration: 20"></a-camera>
+    </a-entity>
 
-    <!-- PATAS DE SOPORTE -->
-    <a-cylinder position="-0.5 0.25 -2" radius="0.05" height="0.5" color="#222222"></a-cylinder>
-    <a-cylinder position="0.5 0.25 -2" radius="0.05" height="0.5" color="#222222"></a-cylinder>
-    <a-cylinder position="-0.5 0.25 -6" radius="0.05" height="0.5" color="#222222"></a-cylinder>
-    <a-cylinder position="0.5 0.25 -6" radius="0.05" height="0.5" color="#222222"></a-cylinder>
-
-    <!-- CARGA / CAJA SOBRE LA BANDA -->
-    <a-box position="0 0.9 -3.5" width="0.6" height="0.4" depth="0.6" color="#D2B48C"></a-box>
-
-    <!-- TORRE CON SENSOR E INDICADOR -->
-    <!-- Poste vertical -->
-    <a-cylinder position="-0.8 1 -4" radius="0.03" height="1.2" color="#777777"></a-cylinder>
-    <!-- Luz / Sensor (Esfera) -->
-    <a-sphere position="-0.8 1.6 -4" radius="0.1" color="#00FF00"></a-sphere>
+    <!-- LAMINADORA CON ESCALA NORMALIZADA -->
+    <a-entity 
+      gltf-model="#laminadorasCAD" 
+      position="0 0 -2" 
+      scale="0.01 0.01 0.01">
+    </a-entity>
   </a-scene>
 </body>
 </html>
