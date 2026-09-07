@@ -2,36 +2,125 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Laboratorio XR - Laminadoras Industriales</title>
-  <!-- Librería principal de A-Frame -->
+  <title>Laboratorio XR - Control Multiplataforma</title>
+  <!-- Librería principal A-Frame -->
   <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.1/dist/aframe-master.min.js"></script>
-  <!-- Librería de controles y visualización extra -->
-  <script src="https://cdn.jsdelivr.net/cdn.aframe-extras/6.1.1/aframe-extras.min.js"></script>
+  
+  <style>
+    /* Estilos del panel de botones flotante */
+    #ui-container {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-family: Arial, sans-serif;
+    }
+    .btn-xr {
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: background 0.3s;
+    }
+    .btn-xr:hover {
+      background-color: #005f7f;
+    }
+    .btn-vr {
+      background-color: #e74c3c;
+    }
+    .btn-vr:hover {
+      background-color: #c0392b;
+    }
+  </style>
 </head>
 <body>
-  <a-scene library>
+
+  <!-- MENÚ DE NAVEGACIÓN INTERACTIVO -->
+  <div id="ui-container">
+    <button class="btn-xr" onclick="mostrarPaso('primitivas')">1. Primitivas Básicas</button>
+    <button class="btn-xr" onclick="mostrarPaso('banda')">2. Banda Transportadora</button>
+    <button class="btn-xr" onclick="mostrarPaso('cad')">3. Laminadoras CAD</button>
+    <button class="btn-xr btn-vr" onclick="entrarVR()">4. Modo VR Inmersivo</button>
+  </div>
+
+  <a-scene embedded vr-mode-ui="enabled: true">
     <a-assets>
       <a-asset-item id="laminadorasCAD" src="models/laminadoras.glb"></a-asset-item>
     </a-assets>
 
-    <!-- ENTORNO E ILUMINACIÓN -->
-    <a-plane rotation="-90 0 0" width="100" height="100" color="#333333"></a-plane>
+    <!-- ENTORNO BASE -->
+    <a-plane rotation="-90 0 0" width="50" height="50" color="#333333"></a-plane>
     <a-sky color="#87CEEB"></a-sky>
-    
-    <a-light type="ambient" color="#ffffff" intensity="1.2"></a-light>
+    <a-light type="ambient" color="#ffffff" intensity="0.8"></a-light>
     <a-light type="directional" position="1 4 2" intensity="1.0"></a-light>
 
-    <!-- CAMARA CON CÁLCULO AUTOMÁTICO -->
-    <a-entity id="rig" position="0 1.6 5">
-      <a-camera look-controls wasd-controls="fly: true; acceleration: 20"></a-camera>
+    <!-- PASO 1: PRIMITIVAS BÁSICAS -->
+    <a-entity id="grupo-primitivas" visible="true">
+      <a-box position="0 1 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+      <a-sphere position="2 1 -4" radius="1" color="#EF2D5E"></a-sphere>
+      <a-cylinder position="-2 1 -4" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
     </a-entity>
 
-    <!-- LAMINADORA CON ESCALA NORMALIZADA -->
-    <a-entity 
-      gltf-model="#laminadorasCAD" 
-      position="0 0 -2" 
-      scale="0.01 0.01 0.01">
+    <!-- PASO 2: BANDA TRANSPORTADORA -->
+    <a-entity id="grupo-banda" visible="false">
+      <a-box position="0 0.5 -4" width="1.2" height="0.4" depth="6" color="#555555"></a-box>
+      <a-cylinder position="0 0.5 -1" rotation="0 0 90" radius="0.25" height="1.1" color="#111111"></a-cylinder>
+      <a-cylinder position="0 0.5 -7" rotation="0 0 90" radius="0.25" height="1.1" color="#111111"></a-cylinder>
+      <a-cylinder position="-0.5 0.25 -2" radius="0.05" height="0.5" color="#222222"></a-cylinder>
+      <a-cylinder position="0.5 0.25 -2" radius="0.05" height="0.5" color="#222222"></a-cylinder>
+      <a-box position="0 0.9 -3.5" width="0.6" height="0.4" depth="0.6" color="#D2B48C"></a-box>
+      <a-cylinder position="-0.8 1 -4" radius="0.03" height="1.2" color="#777777"></a-cylinder>
+      <a-sphere position="-0.8 1.6 -4" radius="0.1" color="#00FF00"></a-sphere>
+    </a-entity>
+
+    <!-- PASO 3: LAMINADORAS CAD (Rotación corregida para ponerla vertical) -->
+    <a-entity id="grupo-cad" visible="false">
+      <a-entity 
+        gltf-model="#laminadorasCAD" 
+        position="0 1 -3" 
+        rotation="-90 0 0" 
+        scale="0.01 0.01 0.01">
+      </a-entity>
+    </a-entity>
+
+    <!-- CÁMARA DE NAVEGACIÓN -->
+    <a-entity id="rig" position="0 1.6 2">
+      <a-camera look-controls wasd-controls></a-camera>
     </a-entity>
   </a-scene>
+
+  <!-- LÓGICA DE INTERACCIÓN DE BOTONES -->
+  <script>
+    function mostrarPaso(paso) {
+      document.getElementById('grupo-primitivas').setAttribute('visible', 'false');
+      document.getElementById('grupo-banda').setAttribute('visible', 'false');
+      document.getElementById('grupo-cad').setAttribute('visible', 'false');
+
+      if (paso === 'primitivas') {
+        document.getElementById('grupo-primitivas').setAttribute('visible', 'true');
+      } else if (paso === 'banda') {
+        document.getElementById('grupo-banda').setAttribute('visible', 'true');
+      } else if (paso === 'cad') {
+        document.getElementById('grupo-cad').setAttribute('visible', 'true');
+      }
+    }
+
+    function entrarVR() {
+      var scene = document.querySelector('a-scene');
+      if (scene.is('vr-mode')) {
+        scene.exitVR();
+      } else {
+        scene.enterVR();
+      }
+    }
+  </script>
 </body>
 </html>
